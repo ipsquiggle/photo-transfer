@@ -35,5 +35,5 @@ if __name__ == "__main__":
 
     print("Transfering Photos (Windows Edition!)")
 
-    DriveToNetwork.Transfer(default_cameraphotospath, default_paths, default_targetpath, default_targetrawpath, actual=args.actual)
+    DriveToNetwork.Transfer(default_paths, default_targetpath, default_targetrawpath, actual=args.actual)
 

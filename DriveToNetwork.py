@@ -164,8 +164,12 @@ def GetCameraPhotos(cameras):
     return _photos
 
 
-def Transfer(logpath, cameras, targetpath, targetrawpath, actual=False):
+def Transfer(cameras, targetpath, targetrawpath, actual=False):
     photos = GetCameraPhotos(cameras)
+
+    logpath = os.path.dirname(os.path.abspath(__file__))
+    logpath = os.path.join(logpath, "logs")
+    MakeDirs(logpath)
 
     textname = os.path.join(logpath, "transferlog-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
 
