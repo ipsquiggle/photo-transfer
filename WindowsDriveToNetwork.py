@@ -1,6 +1,6 @@
 import argparse
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import DriveToNetwork
 from DriveToNetwork import CameraInfo
@@ -15,7 +15,7 @@ default_dropboxpath = {
     "G Phone":r"C:\Dropbox\Camera Uploads",
     "M Phone":r"C:\Users\Michelle\Dropbox\Camera Uploads"
 }
-dropbox_mindate = datetime(2016,7,1)
+dropbox_mindate = datetime.now() - timedelta(days=90)
 
 default_paths = []
 for c in default_cameras:

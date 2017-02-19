@@ -111,7 +111,10 @@ def PrintProgress(l, last=False):
 
 
 def GetCameraPhotosForCamera(camerainfo):
-    print("Getting photos for camera "+camerainfo.name)
+    if(camerainfo.mindate):
+        print("Getting photos for camera "+camerainfo.name+" with min date "+str(camerainfo.mindate))
+    else:
+        print("Getting photos for camera "+camerainfo.name)
     _photos = []
 
     for f in os.listdir(camerainfo.path):
