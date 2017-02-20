@@ -25,7 +25,7 @@ for c in default_cameras:
 
 default_server = "hda"
 default_user = "graham"
-default_targetpath = r"/var/hda/files/xdrive/Michelle\ Pictures\ and\ Video"
+default_targetpath = r"/var/hda/files/xdrive/Michelle Pictures and Video"
 default_targetrawpath = r"/var/hda/files/xdrive/Camera/RAW"
 
 
@@ -37,5 +37,5 @@ if __name__ == "__main__":
 
     print("Transfering Photos (Windows Edition!)")
 
-    DriveToNetwork.TransferRemote(default_paths, default_targetpath, default_targetrawpath, actual=args.actual)
+    DriveToNetwork.TransferRemote(default_paths, default_server, default_user, default_targetpath, default_targetrawpath, actual=args.actual)
 

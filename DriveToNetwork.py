@@ -120,7 +120,7 @@ def GetCameraPhotosForCamera(camerainfo):
     for f in os.listdir(camerainfo.path):
         PrintProgress(_photos)
         name, ext = os.path.splitext(f)
-        if ext in [".jpg", ".JPG", ".mov", ".MOV", ".mts", ".MTS"]:
+        if ext in [".jpg", ".JPG", ".mov", ".MOV", ".mts", ".MTS", ".png", ".PNG"]:
             fullpath = os.path.join(camerainfo.path, f)
             # print("Processing "+fullpath)
             p = Photo(fullpath, camerainfo.name)
@@ -204,8 +204,9 @@ def Transfer(cameras, targetpath, targetrawpath, actual=False):
 
 import plumbum
 from plumbum import local
+from plumbum.path.utils import copy as plumbcopy
 
-def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath, actual=False)
+def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath, actual=False):
     photos = GetCameraPhotos(cameras)
 
     logpath = os.path.dirname(os.path.abspath(__file__))
@@ -214,8 +215,13 @@ def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath,
 
     textname = os.path.join(logpath, "transferlog-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
 
+
+    if len(photos) == 0:
+	print("No photos found.")
+	exit(0)
+
     with open(textname, "w") as f:
-        print("Connectin to {}".format(targetserver))
+        print("Connecting to {}".format(targetserver))
         f.write("Copying photos to {}:\n\n".format(targetserver))
 
         with plumbum.SshMachine(targetserver, user=targetuser) as remote:
@@ -238,7 +244,10 @@ def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath,
                         f.write(" EXISTS\n")
                         continue
                 if actual:
-                    src.copy(dest)
+		    dest_path = dest.dirname
+		    if not dest_path.exists():
+			dest_path.mkdir()
+                    plumbcopy(src, dest)
                 f.write(" OK\n")
                 PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
             PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
