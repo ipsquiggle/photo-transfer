@@ -202,5 +202,53 @@ def Transfer(cameras, targetpath, targetrawpath, actual=False):
     else:
         print("Did not actually copy photos.")
 
+import plumbum
+from plumbum import local
+
+def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath, actual=False)
+    photos = GetCameraPhotos(cameras)
+
+    logpath = os.path.dirname(os.path.abspath(__file__))
+    logpath = os.path.join(logpath, "logs")
+    MakeDirs(logpath)
+
+    textname = os.path.join(logpath, "transferlog-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
+
+    with open(textname, "w") as f:
+        print("Connectin to {}".format(targetserver))
+        f.write("Copying photos to {}:\n\n".format(targetserver))
+
+        with plumbum.SshMachine(targetserver, user=targetuser) as remote:
+
+            skip = 0
+            t = 0
+            for p in photos:
+                t += 1
+                destination = (os.path.join(targetpath, p.destination)
+                                if not p.raw
+                                else os.path.join(targetrawpath, p.destination))
+                f.write("{} => {}".format(p.location, destination))
+                src = local.path(p.location)
+                dest = remote.path(destination)
+                if dest.exists():
+                    src_stat = src.stat()
+                    dest_stat = dest.stat()
+                    if src_stat.st_size == dest_stat.st_size and src_stat.st_mtime == dest_stat.st_mtime and src_stat.st_atime == dest_stat.st_atime:
+                        skip += 1
+                        f.write(" EXISTS\n")
+                        continue
+                if actual:
+                    src.copy(dest)
+                f.write(" OK\n")
+                PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
+            PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
+
+            f.write("\nDone.\n")
+
+    if actual:
+        print("Copied photos.")
+    else:
+        print("Did not actually copy photos.")
+
 
 
