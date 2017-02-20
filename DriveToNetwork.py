@@ -224,7 +224,7 @@ def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath,
         print("Connecting to {}".format(targetserver))
         f.write("Copying photos to {}:\n\n".format(targetserver))
 
-        with plumbum.SshMachine(targetserver, user=targetuser) as remote:
+        with plumbum.SshMachine(targetserver, user=targetuser, scp_opts=['-p']) as remote:
 
             skip = 0
             t = 0
