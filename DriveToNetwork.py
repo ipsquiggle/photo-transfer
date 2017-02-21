@@ -2,7 +2,6 @@ import exifread
 import os
 import math
 import string
-import timeit
 import shutil
 from datetime import datetime, timedelta
 from copy import copy
@@ -10,6 +9,7 @@ import errno
 import filecmp
 import argparse
 import collections
+from PrintProgress import PrintProgress
 
 CameraInfo = collections.namedtuple('CameraInfo', 'name path raw mindate')
 
@@ -93,21 +93,6 @@ class Photo():
 
         ctime = os.path.getctime(path)
         return datetime.fromtimestamp(ctime)
-
-starttimer = None
-def PrintProgress(l, last=False):
-    global starttimer
-    if starttimer == None:
-        starttimer = timeit.default_timer()
-
-    if last or timeit.default_timer() - starttimer > 1.0:
-        if type(l) == list:
-            print(len(l))
-        else:
-            print(l)
-        starttimer = None
-        return
-
 
 
 def GetCameraPhotosForCamera(camerainfo):
@@ -209,16 +194,15 @@ from plumbum.path.utils import copy as plumbcopy
 def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath, actual=False):
     photos = GetCameraPhotos(cameras)
 
+    if len(photos) == 0:
+        print("No photos found.")
+        exit(0)
+
     logpath = os.path.dirname(os.path.abspath(__file__))
     logpath = os.path.join(logpath, "logs")
     MakeDirs(logpath)
 
-    textname = os.path.join(logpath, "transferlog-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
-
-
-    if len(photos) == 0:
-	print("No photos found.")
-	exit(0)
+    textname = os.path.join(logpath, "drive-to-network-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
 
     with open(textname, "w") as f:
         print("Connecting to {}".format(targetserver))
@@ -244,9 +228,9 @@ def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath,
                         f.write(" EXISTS\n")
                         continue
                 if actual:
-		    dest_path = dest.dirname
-		    if not dest_path.exists():
-			dest_path.mkdir()
+                    dest_path = dest.dirname
+                    if not dest_path.exists():
+                        dest_path.mkdir()
                     plumbcopy(src, dest)
                 f.write(" OK\n")
                 PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
