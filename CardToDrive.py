@@ -39,16 +39,18 @@ def Transfer(srcpath, destpath, cameras, actual=False):
     src = local.path(srcpath)
     photos = GetCardPhotos(src)
 
-    camera = CameraForCard(cameras, src)
-    dest = local.path(destpath) / camera
-
     if len(photos) == 0:
         print("No photos found.")
         exit(0)
 
+    camera = CameraForCard(cameras, src)
+    dest = local.path(destpath) / camera
+
     logpath = local.path(__file__).dirname / "logs"
 
     textname = logpath / ("card-to-drive-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
+
+    copied = []
 
     with open(textname, "w") as f:
 
@@ -57,16 +59,19 @@ def Transfer(srcpath, destpath, cameras, actual=False):
 
         skip = 0
         t = 0
-        if actual:
-            dest.mkdir()
 
         for p in photos:
             t += 1
             srcfile = p.path
             destfile = dest / p.name
             f.write("{} => {}".format(srcfile, destfile))
+            if destfile.exists() and filecmp(srcfile, destfile):
+                skip += 1
+                f.write(" EXISTS\n")
+                continue
             if actual:
                 srcfile.copy(destfile)
+            copied += srcfile
             f.write(" OK\n")
             PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
         PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
@@ -74,9 +79,14 @@ def Transfer(srcpath, destpath, cameras, actual=False):
         f.write("\nDone.\n")
 
     if actual:
-        print("Copied photos.")
+        print("Copied {} photos.".format(len(copied)))
     else:
-        print("Did not actually copy photos.")
+        print("Did not actually copy {} photos.".format(len(copied)))
+
+    if actual and delete:
+        print("Deleted {} photos.".format(len(copied)))
+    else:
+        print("Did not actually delete {} photos.".format(len(copied)))
 
 
 # default_srcpath = "/media/4503-1203"

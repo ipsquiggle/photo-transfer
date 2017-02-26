@@ -1,4 +1,4 @@
-import exifread
+#standard
 import os
 import math
 import string
@@ -9,18 +9,15 @@ import errno
 import filecmp
 import argparse
 import collections
+#libs
+import exifread
+import plumbum
+from plumbum import local
+from plumbum.path.utils import copy as plumbcopy
+#project
 from PrintProgress import PrintProgress
 
 CameraInfo = collections.namedtuple('CameraInfo', 'name path raw mindate')
-
-def MakeDirs(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
 
 def LastOfMonth(date):
     assert(date)
@@ -45,29 +42,30 @@ def PathFromCamera(camera):
     return string.capwords(camera)
 
 class Photo():
-    def __init__(self, location, camera, date=None, raw=False):
-        self.location = location
+    def __init__(self, path, camera, targetpath, date=None, raw=False):
+        self.path = path
         self.camera = camera
         self.date = date
         self.raw = raw
         if self.date == None:
-            self.date = self.DateFromNameOrMeta(location)
-        self.destination = self.TryComputeDestination()
+            self.date = self.DateFromNameOrMeta(path)
+        self.destination = self.TryComputeDestination(targetpath)
         # print("==> "+self.destination)
 
-    def TryComputeDestination(self):
+    def TryComputeDestination(self, targetpath):
         if self.date != None:
-            base, name = os.path.split(self.location)
-            name, ext = os.path.splitext(name)
-            path = PathFromDate(self.date)
-            path = os.path.join(path, PathFromCamera(self.camera))
-            assert(path)
+            destpath = local.path(targetpath) / PathFromDate(self.date) / PathFromCamera(self.camera)
+
+            ext = self.path.suffix
+            name = self.path.stem
+
             datename = self.date.strftime("%Y-%m-%d %H.%M.%S")
+
             if name == datename:
-                name = name+ext
+                return destpath / self.path.name
             else:
-                name = str.format("{} {}{}", datename, name, ext)
-            return os.path.join(path, name)
+                return destpath / str.format("{} {}{}", datename, name, ext)
+
         raise Exception("Couldn't compute a date/destination for "+self.location)
 
     def DateFromNameOrMeta(self, path):
@@ -95,20 +93,19 @@ class Photo():
         return datetime.fromtimestamp(ctime)
 
 
-def GetCameraPhotosForCamera(camerainfo):
+def GetCameraPhotosForCamera(camerainfo, targetpath, targetrawpath):
     if(camerainfo.mindate):
         print("Getting photos for camera "+camerainfo.name+" with min date "+str(camerainfo.mindate))
     else:
         print("Getting photos for camera "+camerainfo.name)
     _photos = []
 
-    for f in os.listdir(camerainfo.path):
-        PrintProgress(_photos)
-        name, ext = os.path.splitext(f)
-        if ext in [".jpg", ".JPG", ".mov", ".MOV", ".mts", ".MTS", ".png", ".PNG"]:
-            fullpath = os.path.join(camerainfo.path, f)
-            # print("Processing "+fullpath)
-            p = Photo(fullpath, camerainfo.name)
+    PrintProgress(_photos)
+        globs = PhotoNormalGlobs()
+        photopaths = camerainfo.path // globs
+        for path in photopaths:
+            PrintProgress(_photos)
+            p = Photo(path, camerainfo.name, targetpath)
             if not camerainfo.mindate or p.date > camerainfo.mindate:
                 _photos.append( p )
 
@@ -121,12 +118,10 @@ def GetCameraPhotosForCamera(camerainfo):
         print("Getting photo raws for camera "+camerainfo.name)
         for p in _photos:
             PrintProgress(_raw)
-            pname, _ = os.path.splitext(p.location)
-            for ex in [".NEF", ".RAW"]:
-                raw = pname + ex
-                if os.path.exists(raw):
-                    # print("Found and processing raw " + raw)
-                    _raw.append( Photo(raw, p.camera, p.date, True) )
+            for ext in rawext:
+                rawpath = p.path.with_suffix(ext)
+                if rawpath.exists():
+                    _raw.append( Photo(rawpath, p.camera, targetrawpath, date=p.date, raw=True) )
 
         PrintProgress(_raw, True)
         print("Done.")
@@ -136,13 +131,13 @@ def GetCameraPhotosForCamera(camerainfo):
     return _photos
 
 
-def GetCameraPhotos(cameras):
+def GetCameraPhotos(cameras, dest, rawdest):
     _photos = []
 
     for camera in cameras:
-        print(camera.name + ": " + camera.path)
-        if os.path.isdir(camera.path):
-            _photos += GetCameraPhotosForCamera(camera)
+        print("{}: {}".format(camera.name, camera.path)
+        if camera.path.is_dir():
+            _photos += GetCameraPhotosForCamera(camera, dest, rawdest)
         else:
             print("\tCouldn't find that path!")
 
@@ -150,98 +145,58 @@ def GetCameraPhotos(cameras):
 
 
 def Transfer(cameras, targetpath, targetrawpath, actual=False):
-    photos = GetCameraPhotos(cameras)
+    print("Transferring photos from all cameras to {}".format(targetpath))
 
-    logpath = os.path.dirname(os.path.abspath(__file__))
-    logpath = os.path.join(logpath, "logs")
-    MakeDirs(logpath)
+    dest = local.path(targetpath)
+    rawdest = local.path(targetrawpath)
 
-    textname = os.path.join(logpath, "transferlog-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
+    photos = GetCameraPhotos(cameras, dest, rawdest)
 
-    with open(textname, "w") as f:
-        print("Copying photos")
-        f.write("Copying photos:\n\n")
-        skip = 0
-        t = 0
-        for p in photos:
-            t += 1
-            destination = (os.path.join(targetpath, p.destination)
-                            if not p.raw
-                            else os.path.join(targetrawpath, p.destination))
-            f.write("{} => {}".format(p.location, destination))
-            if os.path.exists(destination) and filecmp.cmp(p.location, destination):
-                skip += 1
-                f.write(" EXISTS\n")
-                continue
-            if actual:
-                MakeDirs(os.path.dirname(destination))
-                shutil.copy2(p.location, destination)
-            f.write(" OK\n")
-            PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
-        PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
+    def skiptest(srcfile, destfile):
+        return os.path.exists(destination) and filecmp.cmp(srcfile, destfile)
 
-        f.write("\nDone.\n")
+    def actualaction(srcfile, destfile):
+        srcfile.copy(destfile)
+
+    copied = Process(photos, "drive-to-network-", skiptest, actualaction, actual)
 
     if actual:
-        print("Copied photos.")
+        print("Copied {} photos.".format(len(copied)))
     else:
-        print("Did not actually copy photos.")
+        print("Did not actually copy {} photos.".format(len(copied)))
 
-import plumbum
-from plumbum import local
-from plumbum.path.utils import copy as plumbcopy
 
 def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath, actual=False):
-    photos = GetCameraPhotos(cameras)
+    print("Transferring photos from all cameras to {} on {}".format(targetpath, targetserver))
 
-    if len(photos) == 0:
-        print("No photos found.")
-        exit(0)
+    dest = local.path(targetpath)
+    rawdest = local.path(targetrawpath)
 
-    logpath = os.path.dirname(os.path.abspath(__file__))
-    logpath = os.path.join(logpath, "logs")
-    MakeDirs(logpath)
+    photos = GetCameraPhotos(cameras, dest, rawdest)
 
-    textname = os.path.join(logpath, "drive-to-network-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
+    def skiptest(srcfile, destfile):
+        # Note: this is a cheap imitation of filecmp
+        if not dest.exists():
+            return False
+        src_stat = srcfile.stat()
+        dest_stat = destfile.stat()
+        return (src_stat.st_mode == dest_stat.st_mode
+                and src_stat.st_size == dest_stat.st_size
+                and src_stat.st_mtime == dest_stat.st_mtime)
 
-    with open(textname, "w") as f:
-        print("Connecting to {}".format(targetserver))
-        f.write("Copying photos to {}:\n\n".format(targetserver))
+    def actualaction(srcfile, destfile):
+        dest_path = destfile.dirname
+        if not dest_path.exists():
+            dest_path.mkdir()
+        plumbcopy(srcfile, destfile)
 
-        with plumbum.SshMachine(targetserver, user=targetuser, scp_opts=['-p']) as remote:
-
-            skip = 0
-            t = 0
-            for p in photos:
-                t += 1
-                destination = (os.path.join(targetpath, p.destination)
-                                if not p.raw
-                                else os.path.join(targetrawpath, p.destination))
-                f.write("{} => {}".format(p.location, destination))
-                src = local.path(p.location)
-                dest = remote.path(destination)
-                if dest.exists():
-                    src_stat = src.stat()
-                    dest_stat = dest.stat()
-                    if src_stat.st_size == dest_stat.st_size and src_stat.st_mtime == dest_stat.st_mtime and src_stat.st_atime == dest_stat.st_atime:
-                        skip += 1
-                        f.write(" EXISTS\n")
-                        continue
-                if actual:
-                    dest_path = dest.dirname
-                    if not dest_path.exists():
-                        dest_path.mkdir()
-                    plumbcopy(src, dest)
-                f.write(" OK\n")
-                PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
-            PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
-
-            f.write("\nDone.\n")
+    copied = []
+    with plumbum.SshMachine(targetserver, user=targetuser, scp_opts=['-p']) as remote:
+        copied = Process(photos, "drive-to-network-remote-", skiptest, actualaction, actual)
 
     if actual:
-        print("Copied photos.")
+        print("Copied {} photos.".format(len(copied)))
     else:
-        print("Did not actually copy photos.")
-
+        print("Did not actually copy {} photos.".format(len(copied)))
 
 
