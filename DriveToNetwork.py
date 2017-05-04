@@ -15,9 +15,7 @@ import plumbum
 from plumbum import local
 from plumbum.path.utils import copy as plumbcopy
 #project
-from PrintProgress import PrintProgress
-
-CameraInfo = collections.namedtuple('CameraInfo', 'name path raw mindate')
+from TransferCommon import PrintProgress
 
 def LastOfMonth(date):
     assert(date)
@@ -47,6 +45,8 @@ class Photo():
         self.camera = camera
         self.date = date
         self.raw = raw
+        if self.camera == None:
+            self.camera = self.CameraFromMeta(path)
         if self.date == None:
             self.date = self.DateFromNameOrMeta(path)
         self.destination = self.TryComputeDestination(targetpath)
@@ -68,6 +68,40 @@ class Photo():
 
         raise Exception("Couldn't compute a date/destination for "+self.location)
 
+    def FetchTags(self, path):
+        if self.tags != None:
+            return self.tags
+
+        f = open(path, 'rb')
+        if f != None:
+            self.tags = exifread.process_file(f, stop_tag="DateTimeOriginal", details=False)
+            return self.tags
+
+        return None
+
+
+    def CameraFromMeta(self, path):
+        base, name = os.path.split(path)
+        name, ext = os.path.splitext(name)
+        try:
+            trydate = datetime.strptime(name, "%Y-%m-%d %H.%M.%S")
+            # print("Found date in name: "+trydate)
+            return trydate
+        except:
+            pass
+
+        tags = self.FetchTags(path)
+        if "EXIF DateTimeOriginal" in tags:
+            # print("Found date in exif: " + str(tags["EXIF DateTimeOriginal"]))
+            try:
+                trydate = datetime.strptime(str(tags["EXIF DateTimeOriginal"]), "%Y:%m:%d %H:%M:%S")
+                return trydate
+            except:
+                raise
+
+        ctime = os.path.getctime(path)
+        return datetime.fromtimestamp(ctime)
+
     def DateFromNameOrMeta(self, path):
         base, name = os.path.split(path)
         name, ext = os.path.splitext(name)
@@ -78,9 +112,8 @@ class Photo():
         except:
             pass
 
-        f = open(path, 'rb')
-        if f != None:
-            tags = exifread.process_file(f, stop_tag="DateTimeOriginal", details=False)
+        tags = self.FetchTags(path)
+        if tags != None:
             if "EXIF DateTimeOriginal" in tags:
                 # print("Found date in exif: " + str(tags["EXIF DateTimeOriginal"]))
                 try:
@@ -100,14 +133,13 @@ def GetCameraPhotosForCamera(camerainfo, targetpath, targetrawpath):
         print("Getting photos for camera "+camerainfo.name)
     _photos = []
 
-    PrintProgress(_photos)
-        globs = PhotoNormalGlobs()
-        photopaths = camerainfo.path // globs
-        for path in photopaths:
-            PrintProgress(_photos)
-            p = Photo(path, camerainfo.name, targetpath)
-            if not camerainfo.mindate or p.date > camerainfo.mindate:
-                _photos.append( p )
+    globs = PhotoNormalGlobs()
+    photopaths = camerainfo.path // globs
+    for path in photopaths:
+        PrintProgress(_photos)
+        p = Photo(path, camerainfo.name, targetpath)
+        if not camerainfo.mindate or p.date > camerainfo.mindate:
+            _photos.append( p )
 
     PrintProgress(_photos, True)
     print("Done.")
@@ -130,12 +162,11 @@ def GetCameraPhotosForCamera(camerainfo, targetpath, targetrawpath):
 
     return _photos
 
-
 def GetCameraPhotos(cameras, dest, rawdest):
     _photos = []
 
     for camera in cameras:
-        print("{}: {}".format(camera.name, camera.path)
+        print("{}: {}".format(camera.name, camera.path))
         if camera.path.is_dir():
             _photos += GetCameraPhotosForCamera(camera, dest, rawdest)
         else:
@@ -176,7 +207,7 @@ def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath,
 
     def skiptest(srcfile, destfile):
         # Note: this is a cheap imitation of filecmp
-        if not dest.exists():
+        if not destfile.exists():
             return False
         src_stat = srcfile.stat()
         dest_stat = destfile.stat()

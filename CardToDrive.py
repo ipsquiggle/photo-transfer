@@ -4,95 +4,91 @@ from datetime import datetime, timedelta
 import itertools
 import plumbum
 from plumbum import local
+from plumbum.path.utils import copy as plumbcopy
 #project
-from PrintProgress import PrintProgress
-from PhotoGlobs import PhotoGlobs
+from TransferCommon import PrintProgress
+from TransferCommon import PhotoGlobs
+from TransferCommon import Process
 
 class Photo:
-    def __init__(self, name, path):
+    def __init__(self, name, path, destination):
         self.name = name
         self.path = path
+        self.destination = destination
 
-def CameraForCard(cameras, path):
-    for camera in cameras:
-        camerapath = path / camera / ".camera"
-        if camerapath.exists():
-            return camera
-
-    return "Unknown"
-
-def GetCardPhotos(src):
-    print("Looking for photos at {}".format(src))
+def GetCardPhotosForCamera(camera, destpath):
+    print("Looking for photos for {} at {}".format(camera.name, camera.path))
     _photos = []
     globs = PhotoGlobs()
-    photopaths = src // globs
+    photopaths = camera.path // globs
     for path in photopaths:
-        _photos.append(Photo(path.name, path))
+        _photos.append(Photo(path.name, path, destpath / camera.name / path.name))
         PrintProgress(_photos)
     PrintProgress(_photos, True)
 
     return _photos
 
-def Transfer(srcpath, destpath, cameras, actual=False):
-    print("Transferring from {} to {}".format(srcpath, destpath))
+def GetCardPhotos(cameras, destpath):
+    _photos = []
 
-    src = local.path(srcpath)
-    photos = GetCardPhotos(src)
+    for camera in cameras:
+        print("{}: {}".format(camera.name, camera.path))
+        if camera.path.is_dir():
+            _photos += GetCardPhotosForCamera(camera, destpath)
+        else:
+            print("\tCouldn't find that path!")
+
+    return _photos
+
+def Transfer(cameras, destpath, delete=False, actual=False):
+    print("Transferring photos from cards to {}".format(destpath))
+
+    print("\nGathering Photos")
+
+    photos = GetCardPhotos(cameras, destpath)
 
     if len(photos) == 0:
         print("No photos found.")
         exit(0)
 
-    camera = CameraForCard(cameras, src)
-    dest = local.path(destpath) / camera
+    def copyskiptest(srcfile, destfile):
+        # Note: this is a cheap imitation of filecmp
+        if not destfile.exists():
+            return False
+        src_stat = srcfile.stat()
+        dest_stat = destfile.stat()
+        return (src_stat.st_mode == dest_stat.st_mode
+                and src_stat.st_size == dest_stat.st_size
+                and src_stat.st_mtime == dest_stat.st_mtime)
 
-    logpath = local.path(__file__).dirname / "logs"
+    def actualcopy(srcfile, destfile):
+        dest_path = destfile.dirname
+        if not dest_path.exists():
+            dest_path.mkdir()
+        plumbcopy(srcfile, destfile)
 
-    textname = logpath / ("card-to-drive-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
-
-    copied = []
-
-    with open(textname, "w") as f:
-
-        print("Grabbing {} photos from {}".format(len(photos), camera))
-        f.write("Grabbing {} photos from {}\n\n".format(len(photos), camera))
-
-        skip = 0
-        t = 0
-
-        for p in photos:
-            t += 1
-            srcfile = p.path
-            destfile = dest / p.name
-            f.write("{} => {}".format(srcfile, destfile))
-            if destfile.exists() and filecmp(srcfile, destfile):
-                skip += 1
-                f.write(" EXISTS\n")
-                continue
-            if actual:
-                srcfile.copy(destfile)
-            copied += srcfile
-            f.write(" OK\n")
-            PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
-        PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
-
-        f.write("\nDone.\n")
+    print("\nCopying Photos")
+    copied = Process(photos, "card-to-drive-", copyskiptest, actualcopy, actual)
 
     if actual:
         print("Copied {} photos.".format(len(copied)))
     else:
         print("Did not actually copy {} photos.".format(len(copied)))
 
-    if actual and delete:
-        print("Deleted {} photos.".format(len(copied)))
+    if delete:
+        def deleteskiptest(srcfile, destfile):
+            return False
+
+        def actualdelete(srcfile, destfile):
+            srcfile.delete()
+
+        print("\nDeleting Photos")
+        deleted = Process(photos, "erase-card-", deleteskiptest, actualdelete, actual)
+
+        if actual:
+            print("Deleted {} photos.".format(len(deleted)))
+        else:
+            print("Did not actually delete {} photos.".format(len(deleted)))
     else:
-        print("Did not actually delete {} photos.".format(len(copied)))
+        print("No deletions.")
 
-
-# default_srcpath = "/media/4503-1203"
-# default_destpath = "/media/usbdrive"
-default_srcpath = r"c:\Users\graham\Pictures\Gords Camera"
-default_destpath = r"c:\Users\graham\Pictures\Gords Camera 2"
-default_cameras = ["Nikon", "Panasonic"]
-
-Transfer(default_srcpath, default_destpath, default_cameras, False)

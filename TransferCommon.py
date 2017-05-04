@@ -1,8 +1,13 @@
+#system
+import itertools
+from datetime import datetime
+#lib
+import plumbum
+from plumbum import local
 
 #################################################
 ### UTILS
 
-import itertools
 
 imageext = [".jpg",".png"]
 movieext = [".mov",".mts",".mp4"]
@@ -64,18 +69,19 @@ def Process(photos, logprefix, skiptest, actualaction, actual):
             destfile = p.destination
 
             f.write("{} => {}".format(srcfile, destfile))
-            if skipaction(srcfile, destfile):
+            if skiptest(srcfile, destfile):
                 skip += 1
                 f.write(" SKIPPED\n")
                 continue
             if actual:
                 actualaction(srcfile, destfile)
-            acted += srcfile
+            acted.append(srcfile)
             f.write(" OK\n")
             PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
         PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
 
         f.write("\nDone.\n")
+        print("Logged to {}".format(textname))
 
     return acted
 
