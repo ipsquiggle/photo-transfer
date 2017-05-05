@@ -3,6 +3,7 @@ import argparse
 import os
 #project
 import CardToDrive
+from Config import Cameras
 from Config import Windows as Config
 
 if __name__ == "__main__":
@@ -14,4 +15,4 @@ if __name__ == "__main__":
 
     print("Transfering Card (Windows Edition!)")
 
-    CardToDrive.Transfer(Config["Cameras"], Config["LocalPath"], delete=args.delete, actual=args.actual)
+    CardToDrive.Transfer(Config["SearchPaths"], Config["LocalPath"], delete=args.delete, actual=args.actual)

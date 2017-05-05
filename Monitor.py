@@ -4,6 +4,7 @@ import argparse
 import time
 from subprocess import Popen
 from subprocess import PIPE
+from subprocess import STDOUT
 #project
 
 class ScriptException(Exception):
@@ -21,7 +22,7 @@ def RunScript(scriptname, delete, actual):
     print(card_args)
     print('')
 
-    card_process = Popen(card_args, stdout=PIPE, stderr=PIPE, bufsize=1)
+    card_process = Popen(card_args, stdout=PIPE, stderr=STDOUT, bufsize=1)
 
     for line in iter(card_process.stdout.readline, b''):
         sys.stdout.write(line)

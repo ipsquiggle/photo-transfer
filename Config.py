@@ -6,12 +6,17 @@ from datetime import datetime, timedelta
 import plumbum
 from plumbum import local
 
-CameraInfo = collections.namedtuple('CameraInfo', 'name path raw mindate id')
+SearchPath = collections.namedtuple('SearchPath', 'name path mindate')
+CameraInfo = collections.namedtuple('CameraInfo', 'name raw id')
 
 DropboxMindate = datetime.now() - timedelta(days=90)
 
-# Linux_CardPath = local.path(r"/media/4503-1203")
-Linux_CardPath = local.path(r"c:\Users\graham\Pictures\Gords Camera")
+Cameras = [
+    CameraInfo("Nikon", True, "NIKON D3300"),
+    CameraInfo("Panasonic", False, "DMC-ZS20"),
+    CameraInfo("G Phone",  False, "LG-D852"),
+    CameraInfo("M Phone", False, "SGH-I747M")
+]
 
 Linux = {
     "Server" : "hda",
@@ -20,12 +25,12 @@ Linux = {
     "LocalPath" : local.path(r"c:\Users\graham\Pictures\Gords Camera 2"),
     "RemotePath" : local.path(r"/var/hda/files/xdrive/Michelle Pictures and Video"),
     "RemoteRawPath" : local.path(r"/var/hda/files/xdrive/Camera/RAW"),
-    "Cameras" : [
-        CameraInfo("Nikon", Linux_CardPath, True, None, "NIKON D3300"),
-        CameraInfo("Panasonic", Linux_CardPath, False, None, "DMC-ZS20"),
-        # CameraInfo("G Phone", local.path(r"~/Dropbox/Camera Uploads"), False, DropboxMindate, "LG-D852"),
-        # CameraInfo("M Phone", local.path(r"~/Dropbox_Michelle/Camera Uploads"), False, DropboxMindate, "SGH-I747M")
-    ]
+    "SearchPaths" : [
+        # SearchPath("G Dropbox", local.path(r"~/Dropbox/Camera Uploads"), DropboxMindate),
+        # SearchPath("M Dropbox", local.path(r"~/Dropbox_Michelle/Camera Uploads"), DropboxMindate),
+        SearchPath("SD Card", local.path(r"c:\Users\graham\Pictures\Gords Camera"), None),
+        # SearchPath("SD Card", local.path(r"/media/4503-1203"), None),
+    ],
 }
 
 Windows_CardPath = local.path(r"C:\Users\graham\Pictures\Gords Camera")
@@ -33,14 +38,16 @@ Windows_CardPath = local.path(r"C:\Users\graham\Pictures\Gords Camera")
 
 Windows = {
     "LocalPath" : local.path(r"c:\Users\graham\Pictures\Gords Camera 2"),
-    "RemotePath" : local.path(r"X:\Michelle Pictures and Video"),
-    "RemoteRawPath" : local.path(r"X:\Camera\RAW"),
-    "Cameras" : [
-        CameraInfo("Nikon", Windows_CardPath, True, None, "NIKON D3300"),
-        CameraInfo("Panasonic", Windows_CardPath, False, None, "DMC-ZS20"),
-        # CameraInfo("G Phone", local.path(r"C:\Dropbox\Camera Uploads"), False, DropboxMindate, "LG-D852"),
-        # CameraInfo("M Phone", local.path(r"C:\Users\Michelle\Dropbox\Camera Uploads"), False, DropboxMindate, "SGH-I747M")
-    ]
+    "RemotePath" :  local.path(r"C:\Users\graham\Pictures\Gords Camera 3"),
+    "RemoteRawPath" :  local.path(r"C:\Users\graham\Pictures\Gords Camera 3 Raw"),
+    # "RemotePath" : local.path(r"X:\Michelle Pictures and Video"),
+    # "RemoteRawPath" : local.path(r"X:\Camera\RAW"),
+    "SearchPaths" : [
+        # SearchPath("G Dropbox", local.path(r"C:\Dropbox\Camera Uploads"), DropboxMindate),
+        # SearchPath("M Dropbox", local.path(r"C:\Users\Michelle\Dropbox\Camera Uploads"), DropboxMindate),
+        SearchPath("SD Card", local.path(r"C:\Users\graham\Pictures\Gords Camera"), None),
+        # SearchPath("SD Card", local.path(r"L:"), None),
+    ],
 }
 
 

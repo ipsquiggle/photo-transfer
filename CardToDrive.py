@@ -16,39 +16,40 @@ class Photo:
         self.path = path
         self.destination = destination
 
-def GetCardPhotosForCamera(camera, destpath):
-    print("Looking for photos for {} at {}".format(camera.name, camera.path))
+def GetPhotosForSource(source, destpath):
+    print("Looking for photos for {} at {}".format(source.name, source.path))
     _photos = []
     globs = PhotoGlobs()
-    photopaths = camera.path // globs
+    photopaths = source.path // globs
     for path in photopaths:
-        _photos.append(Photo(path.name, path, destpath / camera.name / path.name))
+        _photos.append(Photo(path.name, path, destpath / source.name / path.name))
         PrintProgress(_photos)
     PrintProgress(_photos, True)
 
     return _photos
 
-def GetCardPhotos(cameras, destpath):
+def GetSourcePhotos(sources, destpath):
     _photos = []
 
-    for camera in cameras:
-        print("{}: {}".format(camera.name, camera.path))
-        if camera.path.is_dir():
-            _photos += GetCardPhotosForCamera(camera, destpath)
+    for source in sources:
+        print("{}: {}".format(source.name, source.path))
+        if source.path.is_dir():
+            _photos += GetPhotosForSource(source, destpath)
         else:
             print("\tCouldn't find that path!")
 
     return _photos
 
-def Transfer(cameras, destpath, delete=False, actual=False):
+def Transfer(sources, destpath, delete=False, actual=False):
     print("Transferring photos from cards to {}".format(destpath))
 
     print("\nGathering Photos")
 
-    photos = GetCardPhotos(cameras, destpath)
+    photos = GetSourcePhotos(sources, destpath)
 
     if len(photos) == 0:
         print("No photos found.")
+        sys.stdout.flush()
         exit(0)
 
     def copyskiptest(srcfile, destfile):
