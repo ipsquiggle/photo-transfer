@@ -45,14 +45,14 @@ def PrintProgress(l, last=False):
 ### UTILS
 #################################################
 
-def Process(photos, logprefix, skiptest, actualaction, actual):
+def Process(photos, logpostfix, skiptest, actualaction, actual):
     if len(photos) == 0:
         print("No photos found.")
         return []
 
     logpath = local.path(__file__).dirname / "logs"
 
-    textname = logpath / (logprefix + (datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
+    textname = logpath / (datetime.now().strftime("%Y-%m-%d %H.%M.%S")+logpostfix+".txt")
 
     acted = []
 
@@ -66,7 +66,7 @@ def Process(photos, logprefix, skiptest, actualaction, actual):
         for p in photos:
             t += 1
             srcfile = p.path
-            destfile = p.destination
+            destfile = p.GetDestination()
 
             f.write("{} => {}".format(srcfile, destfile))
             if skiptest(srcfile, destfile):

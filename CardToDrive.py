@@ -9,12 +9,7 @@ from plumbum.path.utils import copy as plumbcopy
 from TransferCommon import PrintProgress
 from TransferCommon import PhotoGlobs
 from TransferCommon import Process
-
-class Photo:
-    def __init__(self, name, path, destination):
-        self.name = name
-        self.path = path
-        self.destination = destination
+from Photo import Photo
 
 def GetPhotosForSource(source, destpath):
     print("Looking for photos for {} at {}".format(source.name, source.path))
@@ -22,7 +17,7 @@ def GetPhotosForSource(source, destpath):
     globs = PhotoGlobs()
     photopaths = source.path // globs
     for path in photopaths:
-        _photos.append(Photo(path.name, path, destpath / source.name / path.name))
+        _photos.append(Photo(path, source.name, destpath))
         PrintProgress(_photos)
     PrintProgress(_photos, True)
 
@@ -69,7 +64,7 @@ def Transfer(sources, destpath, delete=False, actual=False):
         plumbcopy(srcfile, destfile)
 
     print("\nCopying Photos")
-    copied = Process(photos, "card-to-drive-", copyskiptest, actualcopy, actual)
+    copied = Process(photos, "-card-to-drive", copyskiptest, actualcopy, actual)
 
     if actual:
         print("Copied {} photos.".format(len(copied)))
@@ -84,7 +79,7 @@ def Transfer(sources, destpath, delete=False, actual=False):
             srcfile.delete()
 
         print("\nDeleting Photos")
-        deleted = Process(photos, "erase-card-", deleteskiptest, actualdelete, actual)
+        deleted = Process(photos, "-erase-card", deleteskiptest, actualdelete, actual)
 
         if actual:
             print("Deleted {} photos.".format(len(deleted)))

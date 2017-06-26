@@ -33,27 +33,17 @@ Linux = {
     ],
 }
 
-Windows_CardPath = local.path(r"C:\Users\graham\Pictures\Gords Camera")
-# Windows_CardPath = local.path(r"L:")
-
 Windows = {
-    "LocalPath" : local.path(r"c:\Users\graham\Pictures\Gords Camera 2"),
-    "RemotePath" :  local.path(r"C:\Users\graham\Pictures\Gords Camera 3"),
-    "RemoteRawPath" :  local.path(r"C:\Users\graham\Pictures\Gords Camera 3 Raw"),
+    "LocalPath" : local.path(r"c:\Users\graham\Pictures\Gords Camera Local"),
+    "RemotePath" :  local.path(r"C:\Users\graham\Pictures\Gords Camera Remote"),
+    "RemoteRawPath" :  local.path(r"C:\Users\graham\Pictures\Gords Camera Remote Raw"),
     # "RemotePath" : local.path(r"X:\Michelle Pictures and Video"),
     # "RemoteRawPath" : local.path(r"X:\Camera\RAW"),
     "SearchPaths" : [
         # SearchPath("G Dropbox", local.path(r"C:\Dropbox\Camera Uploads"), DropboxMindate),
         # SearchPath("M Dropbox", local.path(r"C:\Users\Michelle\Dropbox\Camera Uploads"), DropboxMindate),
-        SearchPath("SD Card", local.path(r"C:\Users\graham\Pictures\Gords Camera"), None),
+        SearchPath("SD Card", local.path(r"C:\Users\graham\Pictures\Gords Camera Card"), None),
         # SearchPath("SD Card", local.path(r"L:"), None),
     ],
 }
-
-
-# WHERE I AM:
-#     I just converted everything in DriveToNetwork file to use plumbum, though I haven't
-#     tested it yet. Need to make sure CardToDrive is converted, and then update
-#     the calling scripts to use it as well! Actually they should probably just
-#     use strings, I only need fancy path stuff within these workers anyways.
 
