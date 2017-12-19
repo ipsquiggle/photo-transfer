@@ -217,8 +217,8 @@ def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath,
 
 
     if len(photos) == 0:
-	print("No photos found.")
-	exit(0)
+        print("No photos found.")
+        exit(0)
 
     with open(textname, "w") as f:
         print("Connecting to {}".format(targetserver))
@@ -244,9 +244,9 @@ def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath,
                         f.write(" EXISTS\n")
                         continue
                 if actual:
-		    dest_path = dest.dirname
-		    if not dest_path.exists():
-			dest_path.mkdir()
+                    dest_path = dest.dirname
+                    if not dest_path.exists():
+                        dest_path.mkdir()
                     plumbcopy(src, dest)
                 f.write(" OK\n")
                 PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
