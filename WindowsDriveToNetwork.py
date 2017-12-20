@@ -15,7 +15,7 @@ default_dropboxpath = {
     "G Phone":r"C:\Dropbox\Camera Uploads",
     "M Phone":r"C:\Users\Michelle\Dropbox\Camera Uploads"
 }
-dropbox_mindate = datetime.now() - timedelta(days=90)
+dropbox_mindate = datetime.now() - timedelta(days=290)
 
 default_paths = []
 for c in default_cameras:
@@ -23,8 +23,8 @@ for c in default_cameras:
 for c,path in default_dropboxpath.items():
     default_paths.append( CameraInfo(c, path, False, dropbox_mindate) )
 
-default_targetpath = r"X:\Michelle Pictures and Video"
-default_targetrawpath = r"X:\Camera\RAW"
+default_targetpath = r"X:\BackedUp\Michelle Pictures and Video"
+default_targetrawpath = r"X:\BackedUp\Camera\RAW"
 
 
 if __name__ == "__main__":
