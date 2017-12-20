@@ -1,0 +1,105 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+actualaction	C:\Projects\photo-transfer\DriveToNetwork.py	/^    def actualaction(srcfile, destfile):$/;"	f	language:Python	function:Transfer
+actualaction	C:\Projects\photo-transfer\DriveToNetwork.py	/^    def actualaction(srcfile, destfile):$/;"	f	language:Python	function:TransferRemote
+actualcopy	C:\Projects\photo-transfer\CardToDrive.py	/^    def actualcopy(srcfile, destfile):$/;"	f	language:Python	function:Transfer
+actualdelete	C:\Projects\photo-transfer\CardToDrive.py	/^        def actualdelete(srcfile, destfile):$/;"	f	language:Python	function:Transfer.actualcopy
+argparse	C:\Projects\photo-transfer\DriveToNetwork.py	/^import argparse$/;"	i	language:Python
+argparse	C:\Projects\photo-transfer\LinuxDriveToNetwork.py	/^import argparse$/;"	i	language:Python
+argparse	C:\Projects\photo-transfer\Monitor.py	/^import argparse$/;"	i	language:Python
+argparse	C:\Projects\photo-transfer\WindowsCardToDrive.py	/^import argparse$/;"	i	language:Python
+argparse	C:\Projects\photo-transfer\WindowsDriveToNetwork.py	/^import argparse$/;"	i	language:Python
+args	C:\Projects\photo-transfer\LinuxDriveToNetwork.py	/^    args = parser.parse_args()$/;"	v	language:Python
+args	C:\Projects\photo-transfer\Monitor.py	/^    args = parser.parse_args()$/;"	v	language:Python
+args	C:\Projects\photo-transfer\WindowsCardToDrive.py	/^    args = parser.parse_args()$/;"	v	language:Python
+args	C:\Projects\photo-transfer\WindowsDriveToNetwork.py	/^    args = parser.parse_args()$/;"	v	language:Python
+CameraFromMeta	C:\Projects\photo-transfer\DriveToNetwork.py	/^    def CameraFromMeta(self, path):$/;"	m	language:Python	class:Photo
+CameraInfo	C:\Projects\photo-transfer\Config.py	/^CameraInfo = collections.namedtuple('CameraInfo', 'name path raw mindate id')$/;"	v	language:Python
+CardToDrive	C:\Projects\photo-transfer\WindowsCardToDrive.py	/^import CardToDrive$/;"	i	language:Python
+collections	C:\Projects\photo-transfer\Config.py	/^import collections$/;"	i	language:Python
+collections	C:\Projects\photo-transfer\DriveToNetwork.py	/^import collections$/;"	i	language:Python
+Config	C:\Projects\photo-transfer\LinuxDriveToNetwork.py	/^from Config import Linux as Config$/;"	i	language:Python
+Config	C:\Projects\photo-transfer\WindowsCardToDrive.py	/^from Config import Windows as Config$/;"	i	language:Python
+Config	C:\Projects\photo-transfer\WindowsDriveToNetwork.py	/^from Config import Windows as Config$/;"	i	language:Python
+copy	C:\Projects\photo-transfer\DriveToNetwork.py	/^from copy import copy$/;"	i	language:Python
+copyskiptest	C:\Projects\photo-transfer\CardToDrive.py	/^    def copyskiptest(srcfile, destfile):$/;"	f	language:Python	function:Transfer
+DateFromNameOrMeta	C:\Projects\photo-transfer\DriveToNetwork.py	/^    def DateFromNameOrMeta(self, path):$/;"	m	language:Python	class:Photo
+datetime	C:\Projects\photo-transfer\CardToDrive.py	/^from datetime import datetime, timedelta$/;"	i	language:Python
+datetime	C:\Projects\photo-transfer\Config.py	/^from datetime import datetime, timedelta$/;"	i	language:Python
+datetime	C:\Projects\photo-transfer\DriveToNetwork.py	/^from datetime import datetime, timedelta$/;"	i	language:Python
+datetime	C:\Projects\photo-transfer\TransferCommon.py	/^from datetime import datetime$/;"	i	language:Python
+deleteskiptest	C:\Projects\photo-transfer\CardToDrive.py	/^        def deleteskiptest(srcfile, destfile):$/;"	f	language:Python	function:Transfer.actualcopy
+DriveToNetwork	C:\Projects\photo-transfer\LinuxDriveToNetwork.py	/^import DriveToNetwork$/;"	i	language:Python
+DriveToNetwork	C:\Projects\photo-transfer\WindowsDriveToNetwork.py	/^import DriveToNetwork$/;"	i	language:Python
+DropboxMindate	C:\Projects\photo-transfer\Config.py	/^DropboxMindate = datetime.now() - timedelta(days=90)$/;"	v	language:Python
+errno	C:\Projects\photo-transfer\DriveToNetwork.py	/^import errno$/;"	i	language:Python
+exifread	C:\Projects\photo-transfer\DriveToNetwork.py	/^import exifread$/;"	i	language:Python
+FetchTags	C:\Projects\photo-transfer\DriveToNetwork.py	/^    def FetchTags(self, path):$/;"	m	language:Python	class:Photo
+filecmp	C:\Projects\photo-transfer\DriveToNetwork.py	/^import filecmp$/;"	i	language:Python
+GetCameraPhotos	C:\Projects\photo-transfer\DriveToNetwork.py	/^def GetCameraPhotos(cameras, dest, rawdest):$/;"	f	language:Python
+GetCameraPhotosForCamera	C:\Projects\photo-transfer\DriveToNetwork.py	/^def GetCameraPhotosForCamera(camerainfo, targetpath, targetrawpath):$/;"	f	language:Python
+GetCardPhotos	C:\Projects\photo-transfer\CardToDrive.py	/^def GetCardPhotos(cameras, destpath):$/;"	f	language:Python
+GetCardPhotosForCamera	C:\Projects\photo-transfer\CardToDrive.py	/^def GetCardPhotosForCamera(camera, destpath):$/;"	f	language:Python
+imageext	C:\Projects\photo-transfer\TransferCommon.py	/^imageext = [".jpg",".png"]$/;"	v	language:Python
+itertools	C:\Projects\photo-transfer\CardToDrive.py	/^import itertools$/;"	i	language:Python
+itertools	C:\Projects\photo-transfer\TransferCommon.py	/^import itertools$/;"	i	language:Python
+LastOfMonth	C:\Projects\photo-transfer\DriveToNetwork.py	/^def LastOfMonth(date):$/;"	f	language:Python
+Linux	C:\Projects\photo-transfer\Config.py	/^Linux = {$/;"	v	language:Python
+Linux_CardPath	C:\Projects\photo-transfer\Config.py	/^Linux_CardPath = local.path(r"c:\\Users\\graham\\Pictures\\Gords Camera")$/;"	v	language:Python
+local	C:\Projects\photo-transfer\CardToDrive.py	/^from plumbum import local$/;"	i	language:Python
+local	C:\Projects\photo-transfer\Config.py	/^from plumbum import local$/;"	i	language:Python
+local	C:\Projects\photo-transfer\DriveToNetwork.py	/^from plumbum import local$/;"	i	language:Python
+local	C:\Projects\photo-transfer\TransferCommon.py	/^from plumbum import local$/;"	i	language:Python
+math	C:\Projects\photo-transfer\DriveToNetwork.py	/^import math$/;"	i	language:Python
+movieext	C:\Projects\photo-transfer\TransferCommon.py	/^movieext = [".mov",".mts",".mp4"]$/;"	v	language:Python
+os	C:\Projects\photo-transfer\Config.py	/^import os$/;"	i	language:Python
+os	C:\Projects\photo-transfer\DriveToNetwork.py	/^import os$/;"	i	language:Python
+os	C:\Projects\photo-transfer\WindowsCardToDrive.py	/^import os$/;"	i	language:Python
+os	C:\Projects\photo-transfer\WindowsDriveToNetwork.py	/^import os$/;"	i	language:Python
+parser	C:\Projects\photo-transfer\LinuxDriveToNetwork.py	/^    parser = argparse.ArgumentParser()$/;"	v	language:Python
+parser	C:\Projects\photo-transfer\Monitor.py	/^    parser = argparse.ArgumentParser()$/;"	v	language:Python
+parser	C:\Projects\photo-transfer\WindowsCardToDrive.py	/^    parser = argparse.ArgumentParser()$/;"	v	language:Python
+parser	C:\Projects\photo-transfer\WindowsDriveToNetwork.py	/^    parser = argparse.ArgumentParser()$/;"	v	language:Python
+PathFromCamera	C:\Projects\photo-transfer\DriveToNetwork.py	/^def PathFromCamera(camera):$/;"	f	language:Python
+PathFromDate	C:\Projects\photo-transfer\DriveToNetwork.py	/^def PathFromDate(date):$/;"	f	language:Python
+Photo	C:\Projects\photo-transfer\CardToDrive.py	/^class Photo:$/;"	c	language:Python
+Photo	C:\Projects\photo-transfer\DriveToNetwork.py	/^class Photo():$/;"	c	language:Python
+PhotoGlobs	C:\Projects\photo-transfer\CardToDrive.py	/^from TransferCommon import PhotoGlobs$/;"	i	language:Python
+PhotoGlobs	C:\Projects\photo-transfer\TransferCommon.py	/^def PhotoGlobs():$/;"	f	language:Python
+PhotoNormalGlobs	C:\Projects\photo-transfer\TransferCommon.py	/^def PhotoNormalGlobs():$/;"	f	language:Python
+PhotoRawGlobs	C:\Projects\photo-transfer\TransferCommon.py	/^def PhotoRawGlobs():$/;"	f	language:Python
+PIPE	C:\Projects\photo-transfer\Monitor.py	/^from subprocess import PIPE$/;"	i	language:Python
+plumbcopy	C:\Projects\photo-transfer\CardToDrive.py	/^from plumbum.path.utils import copy as plumbcopy$/;"	i	language:Python
+plumbcopy	C:\Projects\photo-transfer\DriveToNetwork.py	/^from plumbum.path.utils import copy as plumbcopy$/;"	i	language:Python
+plumbum	C:\Projects\photo-transfer\CardToDrive.py	/^import plumbum$/;"	i	language:Python
+plumbum	C:\Projects\photo-transfer\Config.py	/^import plumbum$/;"	i	language:Python
+plumbum	C:\Projects\photo-transfer\DriveToNetwork.py	/^import plumbum$/;"	i	language:Python
+plumbum	C:\Projects\photo-transfer\TransferCommon.py	/^import plumbum$/;"	i	language:Python
+Popen	C:\Projects\photo-transfer\Monitor.py	/^from subprocess import Popen$/;"	i	language:Python
+PrintProgress	C:\Projects\photo-transfer\CardToDrive.py	/^from TransferCommon import PrintProgress$/;"	i	language:Python
+PrintProgress	C:\Projects\photo-transfer\DriveToNetwork.py	/^from TransferCommon import PrintProgress$/;"	i	language:Python
+PrintProgress	C:\Projects\photo-transfer\TransferCommon.py	/^def PrintProgress(l, last=False):$/;"	f	language:Python
+Process	C:\Projects\photo-transfer\CardToDrive.py	/^from TransferCommon import Process$/;"	i	language:Python
+Process	C:\Projects\photo-transfer\TransferCommon.py	/^def Process(photos, logprefix, skiptest, actualaction, actual):$/;"	f	language:Python
+rawext	C:\Projects\photo-transfer\TransferCommon.py	/^rawext = [".nef",".raw"]$/;"	v	language:Python
+RunScript	C:\Projects\photo-transfer\Monitor.py	/^def RunScript(scriptname, delete, actual):$/;"	f	language:Python
+ScriptException	C:\Projects\photo-transfer\Monitor.py	/^class ScriptException(Exception):$/;"	c	language:Python
+shutil	C:\Projects\photo-transfer\DriveToNetwork.py	/^import shutil$/;"	i	language:Python
+skiptest	C:\Projects\photo-transfer\DriveToNetwork.py	/^    def skiptest(srcfile, destfile):$/;"	f	language:Python	function:Transfer
+skiptest	C:\Projects\photo-transfer\DriveToNetwork.py	/^    def skiptest(srcfile, destfile):$/;"	f	language:Python	function:TransferRemote
+starttimer	C:\Projects\photo-transfer\TransferCommon.py	/^starttimer = None$/;"	v	language:Python
+string	C:\Projects\photo-transfer\DriveToNetwork.py	/^import string$/;"	i	language:Python
+sys	C:\Projects\photo-transfer\Monitor.py	/^import sys$/;"	i	language:Python
+time	C:\Projects\photo-transfer\Monitor.py	/^import time$/;"	i	language:Python
+timedelta	C:\Projects\photo-transfer\CardToDrive.py	/^from datetime import datetime, timedelta$/;"	i	language:Python
+timedelta	C:\Projects\photo-transfer\Config.py	/^from datetime import datetime, timedelta$/;"	i	language:Python
+timedelta	C:\Projects\photo-transfer\DriveToNetwork.py	/^from datetime import datetime, timedelta$/;"	i	language:Python
+timeit	C:\Projects\photo-transfer\TransferCommon.py	/^import timeit$/;"	i	language:Python
+Transfer	C:\Projects\photo-transfer\CardToDrive.py	/^def Transfer(cameras, destpath, delete=False, actual=False):$/;"	f	language:Python
+Transfer	C:\Projects\photo-transfer\DriveToNetwork.py	/^def Transfer(cameras, targetpath, targetrawpath, actual=False):$/;"	f	language:Python
+TransferRemote	C:\Projects\photo-transfer\DriveToNetwork.py	/^def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath, actual=False):$/;"	f	language:Python
+TryComputeDestination	C:\Projects\photo-transfer\DriveToNetwork.py	/^    def TryComputeDestination(self, targetpath):$/;"	m	language:Python	class:Photo
+Windows	C:\Projects\photo-transfer\Config.py	/^Windows = {$/;"	v	language:Python
+Windows_CardPath	C:\Projects\photo-transfer\Config.py	/^Windows_CardPath = local.path(r"C:\\Users\\graham\\Pictures\\Gords Camera")$/;"	v	language:Python
+_globs	C:\Projects\photo-transfer\TransferCommon.py	/^def _globs(ext):$/;"	f	language:Python
+__init__	C:\Projects\photo-transfer\CardToDrive.py	/^    def __init__(self, name, path, destination):$/;"	m	language:Python	class:Photo
+__init__	C:\Projects\photo-transfer\DriveToNetwork.py	/^    def __init__(self, path, camera, targetpath, date=None, raw=False):$/;"	m	language:Python	class:Photo
