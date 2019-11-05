@@ -105,7 +105,7 @@ def PrintProgress(l, last=False):
             print(len(l))
         else:
             print(l)
-        starttimer = None
+        starttimer = None if last else timeit.default_timer()
         return
 
 
@@ -192,7 +192,7 @@ def Transfer(cameras, targetpath, targetrawpath, actual=False):
                 MakeDirs(os.path.dirname(destination))
                 shutil.copy2(p.location, destination)
             f.write(" OK\n")
-            PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
+            PrintProgress(str.format("{:d}/{:d} ({:d} skipped)  {}", t, len(photos), skip, p.destination))
         PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
 
         f.write("\nDone.\n")
@@ -249,7 +249,7 @@ def TransferRemote(cameras, targetserver, targetuser, targetpath, targetrawpath,
                         dest_path.mkdir()
                     plumbcopy(src, dest)
                 f.write(" OK\n")
-                PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip))
+                PrintProgress(str.format("{:d}/{:d} ({:d} skipped)  {}", t, len(photos), skip, p.destinationn))
             PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
 
             f.write("\nDone.\n")
