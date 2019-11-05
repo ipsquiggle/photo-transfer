@@ -8,6 +8,7 @@ from DriveToNetwork import CameraInfo
 default_cameras = {
     "Nikon",
     "Panasonic",
+    "Gord",
 }
 default_cameraphotospath = r"C:\Users\Graham\Pictures"
 
