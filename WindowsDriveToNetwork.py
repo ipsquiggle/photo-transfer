@@ -9,6 +9,9 @@ default_cameras = {
     "Nikon",
     "Panasonic",
     "Gord",
+    "Microscope",
+    "Lily",
+    "Zoe",
 }
 default_cameraphotospath = r"C:\Users\Graham\Pictures"
 
