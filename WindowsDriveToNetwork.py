@@ -16,10 +16,10 @@ default_cameras = {
 default_cameraphotospath = r"C:\Users\Graham\Pictures"
 
 default_dropboxpath = {
-    "G Phone":r"C:\Dropbox\Camera Uploads",
-    "M Phone":r"C:\Users\Michelle\Dropbox\Camera Uploads"
+    "G Phone":r"W:\Graham\Camera Uploads",
+    "M Phone":r"W:\Michelle\Camera Uploads"
 }
-dropbox_mindate = datetime.now() - timedelta(days=290)
+dropbox_mindate = datetime.now() - timedelta(days=312)
 
 default_paths = []
 for c in default_cameras:
