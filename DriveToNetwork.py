@@ -119,6 +119,18 @@ def PrintProgress(l, last=False):
         starttimer = None if last else timeit.default_timer()
         return
 
+def CollectPhotosInFolderAndSubfolders(folder, camerainfo, exts, raw, photos):
+    for f in os.listdir(folder):
+        fullpath = os.path.join(folder, f)
+        if os.path.isdir(fullpath):
+            CollectPhotosInFolderAndSubfolders(fullpath, camerainfo, exts, raw, photos)
+        else:
+            name, ext = os.path.splitext(f)
+            if ext in exts:
+                p = Photo(fullpath, camerainfo.name, raw=raw)
+                if not camerainfo.mindate or p.date > camerainfo.mindate:
+                    photos.append( p )
+            PrintProgress(photos)
 
 
 def GetCameraPhotosForCamera(camerainfo):
@@ -128,47 +140,20 @@ def GetCameraPhotosForCamera(camerainfo):
         print("Getting photos for camera "+camerainfo.name)
     _photos = []
 
-    for f in os.listdir(camerainfo.path):
-        PrintProgress(_photos)
-        name, ext = os.path.splitext(f)
-        if ext in [".jpg", ".JPG", ".mov", ".MOV", ".mts", ".MTS", ".png", ".PNG", ".mp4", ".MP4"]:
-            fullpath = os.path.join(camerainfo.path, f)
-            # print("Processing "+fullpath)
-            p = Photo(fullpath, camerainfo.name)
-            if not camerainfo.mindate or p.date > camerainfo.mindate:
-                _photos.append( p )
-
+    CollectPhotosInFolderAndSubfolders(camerainfo.path, camerainfo, [".jpg", ".JPG", ".mov", ".MOV", ".mts", ".MTS", ".png", ".PNG", ".mp4", ".MP4"], False, _photos)
     PrintProgress(_photos, True)
     print("Done.")
 
 
     if camerainfo.raw:
-        _raw = []
         print("Getting photo raws for camera "+camerainfo.name)
+        _raws = []
 
-        for f in os.listdir(camerainfo.path):
-            PrintProgress(_photos)
-            name, ext = os.path.splitext(f)
-            if ext in [".nef", ".NEF", ".raw", ".RAW", ".arw", ".ARW"]:
-                fullpath = os.path.join(camerainfo.path, f)
-                # print("Processing "+fullpath)
-                p = Photo(fullpath, camerainfo.name, raw=True)
-                if not camerainfo.mindate or p.date > camerainfo.mindate:
-                    _photos.append( p )
-
-        # for p in _photos:
-        #     PrintProgress(_raw)
-        #     pname, _ = os.path.splitext(p.location)
-        #     for ex in [".NEF", ".RAW"]:
-        #         raw = pname + ex
-        #         if os.path.exists(raw):
-        #             # print("Found and processing raw " + raw)
-        #             _raw.append( Photo(raw, p.camera, p.date, True) )
-
-        PrintProgress(_raw, True)
+        CollectPhotosInFolderAndSubfolders(camerainfo.path, camerainfo, [".nef", ".NEF", ".raw", ".RAW", ".arw", ".ARW"], True, _raws)
+        PrintProgress(_raws, True)
         print("Done.")
 
-        _photos += _raw
+        _photos += _raws
 
     return _photos
 
