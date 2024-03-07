@@ -4,12 +4,13 @@ import math
 import string
 import timeit
 import shutil
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from copy import copy
 import errno
 import filecmp
 import argparse
 import collections
+import ffmpegio
 
 CameraInfo = collections.namedtuple('CameraInfo', 'name path raw mindate')
 
@@ -80,16 +81,26 @@ class Photo():
         except:
             pass
 
-        f = open(path, 'rb')
-        if f != None:
-            tags = exifread.process_file(f, stop_tag="DateTimeOriginal", details=False)
-            if "EXIF DateTimeOriginal" in tags:
-                # print("Found date in exif: " + str(tags["EXIF DateTimeOriginal"]))
-                try:
-                    trydate = datetime.strptime(str(tags["EXIF DateTimeOriginal"]), "%Y:%m:%d %H:%M:%S")
-                    return trydate
-                except:
-                    raise
+        if ext in [".mp4", ".MP4"]:
+            creation_time = ffmpegio.probe.format_basic(path)["tags"]["creation_time"]
+            try:
+                trydate = datetime.strptime(creation_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+                trydate = trydate.replace(tzinfo=timezone.utc).astimezone(tz=None) # convert to local time
+                trydate = trydate.replace(tzinfo=None) # remove timezone
+                return trydate
+            except:
+                raise
+        else:
+            f = open(path, 'rb')
+            if f != None:
+                tags = exifread.process_file(f, stop_tag="DateTimeOriginal", details=False)
+                if "EXIF DateTimeOriginal" in tags:
+                    # print("Found date in exif: " + str(tags["EXIF DateTimeOriginal"]))
+                    try:
+                        trydate = datetime.strptime(str(tags["EXIF DateTimeOriginal"]), "%Y:%m:%d %H:%M:%S")
+                        return trydate
+                    except:
+                        raise
 
         ctime = os.path.getctime(path)
         return datetime.fromtimestamp(ctime)
@@ -138,7 +149,7 @@ def GetCameraPhotosForCamera(camerainfo):
         for f in os.listdir(camerainfo.path):
             PrintProgress(_photos)
             name, ext = os.path.splitext(f)
-            if ext in [".nef", ".NEF", ".raw", ".RAW"]:
+            if ext in [".nef", ".NEF", ".raw", ".RAW", ".arw", ".ARW"]:
                 fullpath = os.path.join(camerainfo.path, f)
                 # print("Processing "+fullpath)
                 p = Photo(fullpath, camerainfo.name, raw=True)

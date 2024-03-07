@@ -12,8 +12,9 @@ default_cameras = {
     "Microscope",
     "Lily",
     "Zoe",
+    "a6600",
 }
-default_cameraphotospath = r"C:\Users\Graham\Pictures"
+default_cameraphotospath = r"C:\Users\graha\Pictures"
 
 default_dropboxpath = {
     "G Phone":r"W:\Graham\Camera Uploads",
