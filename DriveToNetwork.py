@@ -11,6 +11,8 @@ import filecmp
 import argparse
 import collections
 import ffmpegio
+from pprint import pprint
+from wakepy import keep
 
 CameraInfo = collections.namedtuple('CameraInfo', 'name path raw mindate')
 
@@ -82,7 +84,9 @@ class Photo():
             pass
 
         if ext in [".mp4", ".MP4"]:
-            creation_time = ffmpegio.probe.format_basic(path)["tags"]["creation_time"]
+            probe_data = ffmpegio.probe.full_details(path, show_streams=False)["format"]
+            # pprint(probe_data)
+            creation_time = probe_data["tags"]["creation_time"]
             try:
                 trydate = datetime.strptime(creation_time, "%Y-%m-%dT%H:%M:%S.%fZ")
                 trydate = trydate.replace(tzinfo=timezone.utc).astimezone(tz=None) # convert to local time
@@ -172,42 +176,43 @@ def GetCameraPhotos(cameras):
 
 
 def Transfer(cameras, targetpath, targetrawpath, actual=False):
-    photos = GetCameraPhotos(cameras)
+    with keep.running():
+        photos = GetCameraPhotos(cameras)
 
-    logpath = os.path.dirname(os.path.abspath(__file__))
-    logpath = os.path.join(logpath, "logs")
-    MakeDirs(logpath)
+        logpath = os.path.dirname(os.path.abspath(__file__))
+        logpath = os.path.join(logpath, "logs")
+        MakeDirs(logpath)
 
-    textname = os.path.join(logpath, "transferlog-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
+        textname = os.path.join(logpath, "transferlog-"+(datetime.now().strftime("%Y-%m-%d %H.%M.%S"))+".txt")
 
-    with open(textname, "w") as f:
-        print("Copying photos")
-        f.write("Copying photos:\n\n")
-        skip = 0
-        t = 0
-        for p in photos:
-            t += 1
-            destination = (os.path.join(targetpath, p.destination)
-                            if not p.raw
-                            else os.path.join(targetrawpath, p.destination))
-            f.write("{} => {}".format(p.location, destination))
-            if os.path.exists(destination) and filecmp.cmp(p.location, destination):
-                skip += 1
-                f.write(" EXISTS\n")
-                continue
-            if actual:
-                MakeDirs(os.path.dirname(destination))
-                shutil.copy2(p.location, destination)
-            f.write(" OK\n")
-            PrintProgress(str.format("{:d}/{:d} ({:d} skipped)  {}", t, len(photos), skip, p.destination))
-        PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
+        with open(textname, "w") as f:
+            print("Copying photos")
+            f.write("Copying photos:\n\n")
+            skip = 0
+            t = 0
+            for p in photos:
+                t += 1
+                destination = (os.path.join(targetpath, p.destination)
+                                if not p.raw
+                                else os.path.join(targetrawpath, p.destination))
+                f.write("{} => {}".format(p.location, destination))
+                if os.path.exists(destination) and filecmp.cmp(p.location, destination):
+                    skip += 1
+                    f.write(" EXISTS\n")
+                    continue
+                if actual:
+                    MakeDirs(os.path.dirname(destination))
+                    shutil.copy2(p.location, destination)
+                f.write(" OK\n")
+                PrintProgress(str.format("{:d}/{:d} ({:d} skipped)  {}", t, len(photos), skip, p.destination))
+            PrintProgress(str.format("{:d}/{:d} ({:d} skipped)", t, len(photos), skip), True)
 
-        f.write("\nDone.\n")
+            f.write("\nDone.\n")
 
-    if actual:
-        print("Copied photos.")
-    else:
-        print("Did not actually copy photos.")
+        if actual:
+            print("Copied photos.")
+        else:
+            print("Did not actually copy photos.")
 
 import plumbum
 from plumbum import local
